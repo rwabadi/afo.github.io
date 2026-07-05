@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abadi Family Office</title>
+  <meta name="description" content="Abadi Family Office — private site.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Abadi Family Office">
+  <meta property="og:url" content="https://abadi.me/">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --abadi-black: #231F20;
+      --abadi-clay: #A1554B;
+      --sand-50: #FAF8F7;
+      --sand-200: #EAE4E0;
+      --sand-300: #DDD4CD;
+      --sand-500: #B5A89F;
+      --sand-700: #7A6E66;
+      --font-display: "Fraunces", Georgia, serif;
+      --font-sans: "Inter", -apple-system, sans-serif;
+      --font-mono: "JetBrains Mono", monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      background: var(--sand-50);
+      color: var(--abadi-black);
+      font-family: var(--font-display);
+      -webkit-font-smoothing: antialiased;
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    .gate {
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .gate__submark { width: 56px; height: 52px; object-fit: contain; }
+
+    .gate__name {
+      margin-top: 28px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      color: var(--abadi-black);
+    }
+
+    .gate__divider {
+      width: 32px;
+      height: 1px;
+      background: var(--abadi-clay);
+      border: none;
+      margin: 28px 0;
+    }
+
+    .gate__title {
+      font-size: 26px;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.26px;
+      line-height: 1.35;
+    }
+
+    .gate__text {
+      margin-top: 16px;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--sand-700);
+    }
+
+    .gate__text--es {
+      margin-top: 6px;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--sand-500);
+    }
+
+    .gate__signin {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 36px;
+      padding: 14px 32px;
+      background: var(--abadi-black);
+      color: var(--sand-50);
+      text-decoration: none;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      transition: background 0.2s ease;
+    }
+
+    .gate__signin:hover { background: #3E3530; }
+    .gate__signin .arrow { color: var(--abadi-clay); }
+
+    .request {
+      margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid var(--sand-200);
+      width: 100%;
+    }
+
+    .request__label {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      color: var(--sand-700);
+    }
+
+    .request__form {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      text-align: left;
+    }
+
+    .request__row { display: flex; gap: 18px; }
+    .request__row > div { flex: 1; }
+
+    .request label {
+      display: block;
+      font-family: var(--font-sans);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: var(--sand-500);
+      margin-bottom: 8px;
+    }
+
+    .request input {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid var(--sand-300);
+      background: transparent;
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--abadi-black);
+      padding: 4px 0 10px;
+      border-radius: 0;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .request input:focus { border-bottom-color: var(--abadi-clay); }
+
+    .request__submit-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .request__submit {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--abadi-black);
+    }
+
+    .request__submit .arrow { color: var(--abadi-clay); transition: transform 0.2s ease; }
+    .request__submit:hover .arrow { transform: translateX(3px); }
+    .request__submit:disabled { opacity: 0.5; cursor: default; }
+
+    .request__done {
+      margin-top: 24px;
+      font-size: 15px;
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--sand-700);
+    }
+
+    .request__error {
+      margin-top: 12px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      color: var(--abadi-clay);
+      display: none;
+    }
+
+    .gate__footer {
+      margin-top: 64px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      color: var(--sand-500);
+    }
+
+    :focus-visible { outline: 2px solid var(--abadi-clay); outline-offset: 3px; }
+    .request input:focus-visible { outline: none; }
+  </style>
+</head>
+<body>
+
+  <div class="gate">
+    <img class="gate__submark" src="assets/submark.png" alt="Abadi Family Office">
+    <div class="gate__name">ABADI FAMILY OFFICE</div>
+    <hr class="gate__divider">
+
+    <h1 class="gate__title">This is a private site.</h1>
+    <p class="gate__text">Access is limited to authorized individuals and requires prior authorization.</p>
+    <p class="gate__text gate__text--es">Sitio privado. El acceso requiere autorización previa.</p>
+
+    <a class="gate__signin" href="https://office.abadi.me">SIGN IN <span class="arrow">→</span></a>
+
+    <div class="request">
+      <div class="request__label">REQUEST ACCESS</div>
+      <form class="request__form" id="request-form">
+        <div class="request__row">
+          <div>
+            <label for="ra-first">FIRST NAME</label>
+            <input id="ra-first" name="firstName" type="text" autocomplete="given-name" required>
+          </div>
+          <div>
+            <label for="ra-last">LAST NAME</label>
+            <input id="ra-last" name="lastName" type="text" autocomplete="family-name" required>
+          </div>
+        </div>
+        <div>
+          <label for="ra-email">EMAIL</label>
+          <input id="ra-email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="request__submit-row">
+          <button class="request__submit" type="submit">Submit <span class="arrow">→</span></button>
+        </div>
+        <p class="request__error" id="request-error">Something went wrong. Please try again.</p>
+      </form>
+    </div>
+
+    <div class="gate__footer">&copy; Abadi Family Office &mdash; Panama City, Panama</div>
+  </div>
+
+  <script>
+    const form = document.getElementById('request-form');
+    const errorEl = document.getElementById('request-error');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.style.display = 'none';
+      const btn = form.querySelector('.request__submit');
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/request-access', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(form)))
+        });
+        if (!res.ok) throw new Error();
+        form.outerHTML = '<p class="request__done">Your request has been received.<br>You will be contacted if access is granted.</p>';
+      } catch {
+        btn.disabled = false;
+        errorEl.style.display = 'block';
+      }
+    });
+  </script>
+
+</body>
+</html>

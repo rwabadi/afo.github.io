@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noticias — Abadi Family Office</title>
+  <meta name="description" content="Noticias de Abadi Family Office.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav__inner container">
+      <a class="nav__logo" href="/es/index.html" aria-label="Abadi Family Office — Inicio">
+        <img src="/assets/logo/submark.png" alt="Abadi Family Office">
+      </a>
+      <nav class="nav__links" aria-label="Principal">
+        <a class="nav__link" href="/es/index.html">Inicio</a>
+        <a class="nav__link" href="/es/about.html">Nosotros</a>
+        <a class="nav__link" href="/es/portfolio.html">Portafolio</a>
+        <a class="nav__link" href="/es/community.html">Comunidad</a>
+        <a class="nav__link" href="/es/news.html" aria-current="page">Noticias</a>
+        <a class="nav__link" href="/es/contact.html">Contacto</a>
+      </nav>
+      <div class="nav__lang" aria-label="Idioma">
+        <a class="nav__lang-alt" href="/news.html" lang="en">EN</a>
+        <span class="nav__lang-dot">·</span>
+        <span class="nav__lang-active">ES</span>
+      </div>
+      <button class="nav__toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="4" y1="6" x2="20" y2="6"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <line x1="4" y1="18" x2="20" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Móvil">
+    <a href="/es/index.html">Inicio</a>
+    <a href="/es/about.html">Nosotros</a>
+    <a href="/es/portfolio.html">Portafolio</a>
+    <a href="/es/community.html">Comunidad</a>
+    <a href="/es/news.html" aria-current="page">Noticias</a>
+    <a href="/es/contact.html">Contacto</a>
+    <a class="mobile-menu__lang" href="/news.html" lang="en">English →</a>
+  </nav>
+
+  <main>
+
+    <section class="page-header">
+      <div class="container">
+        <h1 class="page-header__title">Noticias</h1>
+        <hr class="divider">
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="news-list">
+          <article class="news-item">
+            <div class="news-item__date">21 FEBRERO 2024</div>
+            <div class="news-item__body">
+              <div class="news-item__photo" role="img" aria-label="Showroom insignia de Grupo Silaba, Calle 50" style="background-image: url('/assets/portfolio/silaba-calle50-2.webp')"></div>
+              <h2 class="news-item__title">Sojitz Corporation adquiere Grupo Silaba</h2>
+              <p class="news-item__text">Sojitz Corporation, casa comercial japonesa, adquirió la totalidad de Silaba Motors, S.A. &mdash; fundada en 1991 y segundo grupo automotriz de Panamá por ventas anuales, con un récord histórico de 170,000 unidades vendidas. La adquisición marca la entrada de Sojitz a la distribución y venta de autos en Panamá, y cierra el capítulo familiar de 33 años en el sector.</p>
+              <a class="news-item__link" href="https://www.sojitz.com/en/news/article/20240221.html" target="_blank" rel="noopener">Leer el anuncio en sojitz.com <span class="arrow">→</span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <img class="footer__submark" src="/assets/logo/submark-light.png" alt="">
+      <nav class="footer__nav" aria-label="Pie de página">
+        <a href="/es/index.html">Inicio</a>
+        <a href="/es/about.html">Nosotros</a>
+        <a href="/es/portfolio.html">Portafolio</a>
+        <a href="/es/community.html">Comunidad</a>
+        <a href="/es/news.html" aria-current="page">Noticias</a>
+        <a href="/es/contact.html">Contacto</a>
+      </nav>
+      <div class="footer__location">Ciudad de Panamá, Panamá</div>
+      <div class="footer__copy">&copy; Abadi Family Office</div>
+    </div>
+  </footer>
+
+  <script src="/main.js"></script>
+
+</body>
+</html>
