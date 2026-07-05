@@ -91,42 +91,55 @@
       color: var(--sand-500);
     }
 
-    .gate__signin {
+    .gate__actions {
+      display: flex;
+      gap: 14px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .gate__btn {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      margin-top: 36px;
       padding: 14px 32px;
-      background: var(--abadi-black);
-      color: var(--sand-50);
       text-decoration: none;
       font-family: var(--font-sans);
       font-size: 12px;
       font-weight: 500;
       letter-spacing: 2px;
-      transition: background 0.2s ease;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
 
-    .gate__signin:hover { background: #3E3530; }
-    .gate__signin .arrow { color: var(--abadi-clay); }
+    .gate__btn--primary {
+      background: var(--abadi-black);
+      color: var(--sand-50);
+      border: 1px solid var(--abadi-black);
+    }
+
+    .gate__btn--primary:hover { background: #3E3530; }
+    .gate__btn--primary .arrow { color: var(--abadi-clay); }
+
+    .gate__btn--secondary {
+      background: transparent;
+      color: var(--abadi-black);
+      border: 1px solid var(--sand-300);
+    }
+
+    .gate__btn--secondary:hover { border-color: var(--sand-700); }
+    .gate__btn--secondary[aria-expanded="true"] { border-color: var(--abadi-black); }
 
     .request {
-      margin-top: 56px;
+      margin-top: 48px;
       padding-top: 40px;
       border-top: 1px solid var(--sand-200);
       width: 100%;
     }
 
-    .request__label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 2.5px;
-      color: var(--sand-700);
-    }
-
     .request__form {
-      margin-top: 24px;
+      margin-top: 0;
       display: flex;
       flex-direction: column;
       gap: 18px;
@@ -225,10 +238,12 @@
     <p class="gate__text">Access is limited to authorized individuals and requires prior authorization.</p>
     <p class="gate__text gate__text--es">Sitio privado. El acceso requiere autorización previa.</p>
 
-    <a class="gate__signin" href="https://office.abadi.me">SIGN IN <span class="arrow">→</span></a>
+    <div class="gate__actions">
+      <a class="gate__btn gate__btn--primary" href="https://office.abadi.me">SIGN IN <span class="arrow">→</span></a>
+      <button class="gate__btn gate__btn--secondary" id="request-toggle" aria-expanded="false" aria-controls="request-panel">REQUEST ACCESS</button>
+    </div>
 
-    <div class="request">
-      <div class="request__label">REQUEST ACCESS</div>
+    <div class="request" id="request-panel" hidden>
       <form class="request__form" id="request-form">
         <div class="request__row">
           <div>
@@ -255,6 +270,15 @@
   </div>
 
   <script>
+    const toggle = document.getElementById('request-toggle');
+    const panel = document.getElementById('request-panel');
+    toggle.addEventListener('click', () => {
+      const open = panel.hidden;
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', open);
+      if (open) panel.querySelector('input').focus();
+    });
+
     const form = document.getElementById('request-form');
     const errorEl = document.getElementById('request-error');
     form.addEventListener('submit', async (e) => {
