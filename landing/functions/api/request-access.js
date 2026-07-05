@@ -16,26 +16,41 @@ export async function onRequestPost(context) {
     return new Response('Invalid fields', { status: 400 });
   }
 
-  const res = await fetch('https://api.resend.com/emails', {
+  const card = {
+    type: 'message',
+    attachments: [
+      {
+        contentType: 'application/vnd.microsoft.card.adaptive',
+        content: {
+          $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+          type: 'AdaptiveCard',
+          version: '1.4',
+          body: [
+            { type: 'TextBlock', text: '🔐 Solicitud de acceso — abadi.me', weight: 'Bolder', size: 'Medium' },
+            {
+              type: 'FactSet',
+              facts: [
+                { title: 'Nombre', value: `${firstName} ${lastName}` },
+                { title: 'Email', value: email },
+              ],
+            },
+            {
+              type: 'TextBlock',
+              text: 'Aprobar: Cloudflare Zero Trust → Access → Policies → Guests → agregar este email.',
+              wrap: true,
+              size: 'Small',
+              isSubtle: true,
+            },
+          ],
+        },
+      },
+    ],
+  };
+
+  const res = await fetch(env.TEAMS_WEBHOOK_URL, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'AFO Website <noreply@abadi.me>',
-      to: env.NOTIFY_EMAIL.split(',').map(e => e.trim()),
-      reply_to: email,
-      subject: `Access request — ${firstName} ${lastName}`,
-      text: [
-        'New access request from abadi.me',
-        '',
-        `Name:  ${firstName} ${lastName}`,
-        `Email: ${email}`,
-        '',
-        'To grant access: Cloudflare Zero Trust → Access → Applications → AFO Site → add this email to the allow policy.',
-      ].join('\n'),
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(card),
   });
 
   if (!res.ok) {

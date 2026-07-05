@@ -17,27 +17,36 @@ export async function onRequestPost(context) {
     return new Response('Invalid fields', { status: 400 });
   }
 
-  const res = await fetch('https://api.resend.com/emails', {
+  const card = {
+    type: 'message',
+    attachments: [
+      {
+        contentType: 'application/vnd.microsoft.card.adaptive',
+        content: {
+          $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+          type: 'AdaptiveCard',
+          version: '1.4',
+          body: [
+            { type: 'TextBlock', text: '✉️ Mensaje del formulario de contacto', weight: 'Bolder', size: 'Medium' },
+            {
+              type: 'FactSet',
+              facts: [
+                { title: 'Nombre', value: name },
+                { title: 'Organización', value: organization || '—' },
+                { title: 'Email', value: email },
+              ],
+            },
+            { type: 'TextBlock', text: message, wrap: true },
+          ],
+        },
+      },
+    ],
+  };
+
+  const res = await fetch(env.TEAMS_WEBHOOK_URL, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'AFO Website <noreply@abadi.me>',
-      to: env.NOTIFY_EMAIL.split(',').map(e => e.trim()),
-      reply_to: email,
-      subject: `Website contact — ${name}`,
-      text: [
-        'New message from the contact form',
-        '',
-        `Name:         ${name}`,
-        `Organization: ${organization || '—'}`,
-        `Email:        ${email}`,
-        '',
-        message,
-      ].join('\n'),
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(card),
   });
 
   if (!res.ok) {
