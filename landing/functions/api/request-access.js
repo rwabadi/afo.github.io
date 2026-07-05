@@ -24,7 +24,7 @@ export async function onRequestPost(context) {
     },
     body: JSON.stringify({
       from: 'AFO Website <noreply@abadi.me>',
-      to: [env.NOTIFY_EMAIL],
+      to: env.NOTIFY_EMAIL.split(',').map(e => e.trim()),
       reply_to: email,
       subject: `Access request — ${firstName} ${lastName}`,
       text: [
