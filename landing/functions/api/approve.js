@@ -82,7 +82,7 @@ async function emailGuest(env, payload) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Abadi Family Office <noreply@abadi.me>',
+        from: 'Abadi Family Office <noreply@abadi.family>',
         to: [payload.e],
         subject: 'Access granted — Abadi Family Office',
         text: `Hello ${payload.n},\n\nYour access to the Abadi Family Office site has been approved.\n\nVisit https://abadi.me, choose Sign In, and enter this email address — you will receive a one-time code to enter.\n\nAbadi Family Office\nPanama City, Panama`,
