@@ -17,39 +17,76 @@ export async function onRequestPost(context) {
     return new Response('Invalid fields', { status: 400 });
   }
 
-  const card = {
-    type: 'message',
-    attachments: [
-      {
-        contentType: 'application/vnd.microsoft.card.adaptive',
-        content: {
-          $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-          type: 'AdaptiveCard',
-          version: '1.4',
-          body: [
-            { type: 'TextBlock', text: '✉️ Mensaje del formulario de contacto', weight: 'Bolder', size: 'Medium' },
-            {
-              type: 'FactSet',
-              facts: [
-                { title: 'Nombre', value: name },
-                { title: 'Organización', value: organization || '—' },
-                { title: 'Email', value: email },
+  // Teams card (immediacy)
+  let teamsOk = false;
+  try {
+    const res = await fetch(env.TEAMS_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'message',
+        attachments: [
+          {
+            contentType: 'application/vnd.microsoft.card.adaptive',
+            content: {
+              $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+              type: 'AdaptiveCard',
+              version: '1.4',
+              body: [
+                { type: 'TextBlock', text: '✉️ Mensaje del formulario de contacto', weight: 'Bolder', size: 'Medium' },
+                {
+                  type: 'FactSet',
+                  facts: [
+                    { title: 'Nombre', value: name },
+                    { title: 'Organización', value: organization || '—' },
+                    { title: 'Email', value: email },
+                  ],
+                },
+                { type: 'TextBlock', text: message, wrap: true },
               ],
             },
-            { type: 'TextBlock', text: message, wrap: true },
-          ],
+          },
+        ],
+      }),
+    });
+    teamsOk = res.ok;
+  } catch {
+    // fall through to email
+  }
+
+  // Email via Resend (formal record, reply-to the sender)
+  let emailOk = false;
+  if (env.RESEND_API_KEY && env.NOTIFY_EMAIL) {
+    try {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
         },
-      },
-    ],
-  };
+        body: JSON.stringify({
+          from: 'Abadi Family Office <noreply@abadi.me>',
+          to: env.NOTIFY_EMAIL.split(',').map((e) => e.trim()),
+          reply_to: email,
+          subject: `Website contact — ${name}`,
+          text: [
+            'New message from the contact form at office.abadi.me',
+            '',
+            `Name:         ${name}`,
+            `Organization: ${organization || '—'}`,
+            `Email:        ${email}`,
+            '',
+            message,
+          ].join('\n'),
+        }),
+      });
+      emailOk = res.ok;
+    } catch {
+      // teams may have succeeded
+    }
+  }
 
-  const res = await fetch(env.TEAMS_WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(card),
-  });
-
-  if (!res.ok) {
+  if (!teamsOk && !emailOk) {
     return new Response('Upstream error', { status: 502 });
   }
 
