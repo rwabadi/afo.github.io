@@ -1,0 +1,10 @@
+name = "afo-guest-expiry"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+
+[triggers]
+crons = ["0 * * * *"]
+
+[[kv_namespaces]]
+binding = "GUEST_EXPIRY"
+id = "4197fbde76df45b4adb87ce00bfc2dd8"

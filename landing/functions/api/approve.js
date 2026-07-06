@@ -85,7 +85,7 @@ async function emailGuest(env, payload) {
         from: 'Abadi Family Office <noreply@abadi.me>',
         to: [payload.e],
         subject: 'Access granted — Abadi Family Office',
-        text: `Hello ${payload.n},\n\nYour access to the Abadi Family Office site has been approved.\n\nVisit https://abadi.me, choose Sign In, and enter this email address — you will receive a one-time code to enter.\n\nAbadi Family Office\nPanama City, Panama`,
+        text: `Hello ${payload.n},\n\nYour access to the Abadi Family Office site has been approved for the next 24 hours.\n\nVisit https://abadi.me, choose Sign In, and enter this email address — you will receive a one-time code to enter.\n\nAbadi Family Office\nPanama City, Panama`,
       }),
     });
     return res.ok;
@@ -139,10 +139,15 @@ export async function onRequestGet(context) {
     if (!upd.success) {
       return page('Error', 'No se pudo actualizar la política de invitados. Inténtalo desde el dashboard de Cloudflare.');
     }
+    try {
+      await env.GUEST_EXPIRY.put('guest:' + payload.e.toLowerCase(), String(Date.now() + 24 * 3600 * 1000));
+    } catch {
+      // KV failure should not block approval
+    }
     emailed = await emailGuest(env, payload);
     await notifyTeams(
       env,
-      `✅ ${payload.n} (${payload.e}) aprobado. ${emailed ? 'Se le envió el correo de acceso automáticamente.' : 'Avísenle que ya puede ingresar.'}`
+      `✅ ${payload.n} (${payload.e}) aprobado. ${emailed ? 'Acceso válido por 24 horas — se le envió el correo automáticamente.' : 'Acceso válido por 24 horas — avísenle que ya puede ingresar.'}`
     );
   }
 
@@ -152,7 +157,7 @@ export async function onRequestGet(context) {
 
   return page(
     already ? 'Ya estaba aprobado' : 'Acceso aprobado',
-    `${payload.n} (${payload.e}) ${already ? 'ya tenía acceso al sitio.' : emailed ? 'ya puede ingresar — se le notificó por correo automáticamente.' : 'ya puede ingresar con su código por email.'}`,
+    `${payload.n} (${payload.e}) ${already ? 'ya tenía acceso al sitio.' : emailed ? 'ya puede ingresar durante las próximas 24 horas — se le notificó por correo automáticamente.' : 'ya puede ingresar con su código por email.'}`,
     emailed ? '' : `<a class="btn" href="${mailto}">AVISAR AL INVITADO →</a>`
   );
 }
