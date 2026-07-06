@@ -9,9 +9,8 @@ function b64urlToBytes(s) {
 async function verifyToken(token, secret) {
   const [p, sig] = token.split('.');
   if (!p || !sig) return null;
-  let key;
   try {
-    key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
+    const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
     const ok = await crypto.subtle.verify('HMAC', key, b64urlToBytes(sig), enc.encode(p));
     if (!ok) return null;
     const payload = JSON.parse(new TextDecoder().decode(b64urlToBytes(p)));
@@ -30,6 +29,7 @@ function page(title, body, extra = '') {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title} — AFO</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
 <style>
   body { min-height: 100vh; display: flex; align-items: center; justify-content: center;
     background: #FAF8F7; color: #231F20; font-family: Georgia, serif; padding: 24px; text-align: center; }
@@ -72,6 +72,28 @@ async function notifyTeams(env, text) {
   }
 }
 
+async function emailGuest(env, payload) {
+  if (!env.RESEND_API_KEY) return false;
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Abadi Family Office <noreply@abadi.me>',
+        to: [payload.e],
+        subject: 'Access granted — Abadi Family Office',
+        text: `Hello ${payload.n},\n\nYour access to the Abadi Family Office site has been approved.\n\nVisit https://abadi.me, choose Sign In, and enter this email address — you will receive a one-time code to enter.\n\nAbadi Family Office\nPanama City, Panama`,
+      }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
@@ -81,10 +103,8 @@ export async function onRequestGet(context) {
     return page('Enlace inválido', 'Este enlace es inválido o ya expiró. Pide al solicitante enviar la solicitud de nuevo.');
   }
 
-  const approver = request.headers.get('Cf-Access-Authenticated-User-Email') || 'un miembro autorizado';
-
   if (payload.a === 'reject') {
-    await notifyTeams(env, `❌ Solicitud de acceso de ${payload.n} (${payload.e}) rechazada por ${approver}.`);
+    await notifyTeams(env, `❌ Solicitud de acceso de ${payload.n} (${payload.e}) rechazada.`);
     return page('Solicitud descartada', `La solicitud de ${payload.n} fue rechazada. No se requiere ninguna acción adicional.`);
   }
 
@@ -93,13 +113,14 @@ export async function onRequestGet(context) {
 
   const cur = await (await fetch(api, { headers })).json();
   if (!cur.success) {
-    return page('Error', 'No se pudo leer la política de invitados. Revisa el API token en la configuración del proyecto.');
+    return page('Error', 'No se pudo leer la política de invitados. Revisa la configuración.');
   }
 
   const pol = cur.result;
   const include = pol.include || [];
   const already = include.some((r) => r.email && String(r.email.email).toLowerCase() === payload.e.toLowerCase());
 
+  let emailed = false;
   if (!already) {
     include.push({ email: { email: payload.e } });
     const upd = await (
@@ -118,7 +139,11 @@ export async function onRequestGet(context) {
     if (!upd.success) {
       return page('Error', 'No se pudo actualizar la política de invitados. Inténtalo desde el dashboard de Cloudflare.');
     }
-    await notifyTeams(env, `✅ ${payload.n} (${payload.e}) aprobado por ${approver}. Ya puede ingresar al sitio.`);
+    emailed = await emailGuest(env, payload);
+    await notifyTeams(
+      env,
+      `✅ ${payload.n} (${payload.e}) aprobado. ${emailed ? 'Se le envió el correo de acceso automáticamente.' : 'Avísenle que ya puede ingresar.'}`
+    );
   }
 
   const mailto = `mailto:${encodeURIComponent(payload.e)}?subject=${encodeURIComponent('Access granted — Abadi Family Office')}&body=${encodeURIComponent(
@@ -127,7 +152,7 @@ export async function onRequestGet(context) {
 
   return page(
     already ? 'Ya estaba aprobado' : 'Acceso aprobado',
-    `${payload.n} (${payload.e}) ${already ? 'ya tenía acceso al sitio.' : 'ya puede ingresar con su código por email.'}`,
-    `<a class="btn" href="${mailto}">AVISAR AL INVITADO →</a>`
+    `${payload.n} (${payload.e}) ${already ? 'ya tenía acceso al sitio.' : emailed ? 'ya puede ingresar — se le notificó por correo automáticamente.' : 'ya puede ingresar con su código por email.'}`,
+    emailed ? '' : `<a class="btn" href="${mailto}">AVISAR AL INVITADO →</a>`
   );
 }

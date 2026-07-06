@@ -63,8 +63,8 @@ export async function onRequestPost(context) {
             },
           ],
           actions: [
-            { type: 'Action.OpenUrl', title: '✅ Aprobar', url: `${env.SITE_URL}/api/approve?t=${approveToken}` },
-            { type: 'Action.OpenUrl', title: '❌ Rechazar', url: `${env.SITE_URL}/api/approve?t=${rejectToken}` },
+            { type: 'Action.OpenUrl', title: '✅ Aprobar', url: `${new URL(request.url).origin}/api/approve?t=${approveToken}` },
+            { type: 'Action.OpenUrl', title: '❌ Rechazar', url: `${new URL(request.url).origin}/api/approve?t=${rejectToken}` },
           ],
         },
       },
