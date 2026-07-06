@@ -1,3 +1,18 @@
+const enc = new TextEncoder();
+
+function b64url(bytes) {
+  let bin = '';
+  bytes.forEach((b) => (bin += String.fromCharCode(b)));
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function signToken(payload, secret) {
+  const p = b64url(enc.encode(JSON.stringify(payload)));
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(p)));
+  return `${p}.${b64url(sig)}`;
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -16,6 +31,11 @@ export async function onRequestPost(context) {
     return new Response('Invalid fields', { status: 400 });
   }
 
+  const name = `${firstName} ${lastName}`;
+  const exp = Math.floor(Date.now() / 1000) + 7 * 24 * 3600;
+  const approveToken = await signToken({ e: email, n: name, a: 'approve', x: exp }, env.SIGNING_SECRET);
+  const rejectToken = await signToken({ e: email, n: name, a: 'reject', x: exp }, env.SIGNING_SECRET);
+
   const card = {
     type: 'message',
     attachments: [
@@ -30,17 +50,21 @@ export async function onRequestPost(context) {
             {
               type: 'FactSet',
               facts: [
-                { title: 'Nombre', value: `${firstName} ${lastName}` },
+                { title: 'Nombre', value: name },
                 { title: 'Email', value: email },
               ],
             },
             {
               type: 'TextBlock',
-              text: 'Aprobar: Cloudflare Zero Trust → Access → Policies → Guests → agregar este email.',
+              text: 'Al aprobar se te pedirá iniciar sesión (solo la familia puede aprobar). El enlace vence en 7 días.',
               wrap: true,
               size: 'Small',
               isSubtle: true,
             },
+          ],
+          actions: [
+            { type: 'Action.OpenUrl', title: '✅ Aprobar', url: `${env.SITE_URL}/api/approve?t=${approveToken}` },
+            { type: 'Action.OpenUrl', title: '❌ Rechazar', url: `${env.SITE_URL}/api/approve?t=${rejectToken}` },
           ],
         },
       },
